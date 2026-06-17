@@ -563,7 +563,7 @@
         <div class="card-desc">Acesso completo Netflix com qualidade superior e mais telas.</div>
         <div class="price-row">
           <span class="price-old">R$59,90</span>
-          <span class="price-new">R$10,00</span>
+          <span class="price-new">R$8,00</span>
           <span class="price-period">/mês</span>
         </div>
         <a class="btn-buy" href="https://wa.me/5534996980605?text=Ol%C3%A1%21%20Quero%20contratar%20o%20Netflix%20Pro%20por%20R%248%2C00%20-%2030%20dias%20de%20acesso." target="_blank">
@@ -677,6 +677,40 @@
   <span>Falar no WhatsApp</span>
 </a>
 
+
+  <script>
+  // ─── ANALYTICS STREAMMAX ───
+  const SCRIPT_URL = localStorage.getItem('script_url') || '';
+
+  function dispositivo() {
+    return /Mobi|Android/i.test(navigator.userAgent) ? 'Celular' : 'Computador';
+  }
+
+  function enviar(params) {
+    const url = localStorage.getItem('analytics_url');
+    if (!url) return;
+    const query = new URLSearchParams(params).toString();
+    fetch(url + '?' + query).catch(() => {});
+  }
+
+  // Registrar visita ao carregar
+  window.addEventListener('load', () => {
+    const url = localStorage.getItem('analytics_url');
+    if (url) {
+      enviar({ tipo: 'visita', dispositivo: dispositivo() });
+    }
+  });
+
+  // Rastrear cliques nos botões
+  document.querySelectorAll('.btn-buy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.card');
+      const produto = card ? (card.querySelector('.card-name')?.textContent || 'Desconhecido') : 'Desconhecido';
+      const preco = card ? (card.querySelector('.price-new')?.textContent || '') : '';
+      enviar({ tipo: 'clique', produto, preco, dispositivo: dispositivo() });
+    });
+  });
+  </script>
+
 </body>
 </html>
- 
