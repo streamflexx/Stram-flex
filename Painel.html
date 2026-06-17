@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel — StreamMax</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #08080F; --bg2: #10101A; --bg3: #16162A;
+      --purple: #7C3AED; --green: #10B981; --green-light: #34D399;
+      --gold: #F59E0B; --white: #F8F8FF; --muted: #8887A4;
+      --red: #EF4444; --border: rgba(124,58,237,0.25);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; }
+
+    /* LOGIN */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .login-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 48px 36px; width: 100%; max-width: 380px; text-align: center;
+    }
+    .login-box h1 { font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; }
+    .login-box p { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; }
+    .login-box input {
+      width: 100%; padding: 14px 16px; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--white); font-size: 1rem; font-family: inherit;
+      margin-bottom: 12px; outline: none;
+    }
+    .login-box input:focus { border-color: var(--purple); }
+    .login-box button {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, var(--purple), #5B21B6);
+      color: #fff; font-size: 1rem; font-weight: 700; border: none;
+      border-radius: 10px; cursor: pointer; font-family: inherit;
+      transition: opacity 0.2s;
+    }
+    .login-box button:hover { opacity: 0.85; }
+    .login-error { color: var(--red); font-size: 0.8rem; margin-top: 10px; display: none; }
+
+    /* PAINEL */
+    #painel-screen { display: none; padding: 24px 16px 60px; max-width: 960px; margin: 0 auto; }
+
+    header-p { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .painel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px; flex-wrap: gap;
+    }
+    .painel-header h1 { font-size: 1.5rem; font-weight: 900; }
+    .painel-header span { color: var(--muted); font-size: 0.82rem; }
+    .btn-logout {
+      background: rgba(239,68,68,0.15); color: var(--red);
+      border: 1px solid rgba(239,68,68,0.3); padding: 8px 16px;
+      border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+      font-weight: 700; font-family: inherit;
+    }
+    .btn-atualizar {
+      background: rgba(124,58,237,0.15); color: #9F67F5;
+      border: 1px solid var(--border); padding: 8px 16px;
+      border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+      font-weight: 700; font-family: inherit; margin-right: 8px;
+    }
+
+    /* CARDS STATS */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+    }
+    .stat-card .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 2rem; font-weight: 900; }
+    .stat-card .sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+    .stat-card.green .value { color: var(--green-light); }
+    .stat-card.purple .value { color: #9F67F5; }
+    .stat-card.gold .value { color: var(--gold); }
+    .stat-card.red .value { color: var(--red); }
+
+    /* TABELAS */
+    .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 14px; margin-top: 28px; }
+
+    .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--bg3); padding: 12px 16px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; }
+    td { padding: 12px 16px; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 0.7rem; font-weight: 700; }
+    .badge-green { background: rgba(16,185,129,0.15); color: var(--green-light); }
+    .badge-purple { background: rgba(124,58,237,0.15); color: #9F67F5; }
+
+    /* TOP PRODUTOS */
+    .top-produtos { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .produto-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .produto-item:last-child { border-bottom: none; }
+    .produto-bar-wrap { flex: 1; margin: 0 14px; background: var(--bg3); border-radius: 99px; height: 6px; overflow: hidden; }
+    .produto-bar { height: 100%; background: linear-gradient(90deg, var(--purple), var(--green)); border-radius: 99px; transition: width 0.6s ease; }
+    .produto-count { font-size: 0.8rem; font-weight: 700; color: var(--gold); min-width: 24px; text-align: right; }
+
+    .loading { text-align: center; color: var(--muted); padding: 40px; }
+    .empty { text-align: center; color: var(--muted); padding: 24px; font-size: 0.85rem; }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      td, th { padding: 10px 12px; font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="font-size:2.5rem;margin-bottom:12px;">📊</div>
+    <h1>Painel StreamMax</h1>
+    <p>Área restrita — somente administrador</p>
+    <input type="password" id="senha-input" placeholder="Digite sua senha..." onkeydown="if(event.key==='Enter')entrar()"/>
+    <button onclick="entrar()">Entrar no painel</button>
+    <div class="login-error" id="login-error">❌ Senha incorreta!</div>
+  </div>
+</div>
+
+<!-- PAINEL -->
+<div id="painel-screen">
+  <div class="painel-header">
+    <div>
+      <h1>📊 Painel StreamMax</h1>
+      <span id="ultima-atualizacao">Carregando...</span>
+    </div>
+    <div>
+      <button class="btn-atualizar" onclick="carregarDados()">🔄 Atualizar</button>
+      <button class="btn-logout" onclick="sair()">Sair</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card green">
+      <div class="label">👁️ Total de Visitas</div>
+      <div class="value" id="total-visitas">—</div>
+      <div class="sub" id="visitas-hoje">hoje: —</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="label">🛒 Total de Cliques</div>
+      <div class="value" id="total-cliques">—</div>
+      <div class="sub" id="cliques-hoje">hoje: —</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="label">📈 Taxa de Conversão</div>
+      <div class="value" id="taxa">—</div>
+      <div class="sub">cliques / visitas</div>
+    </div>
+    <div class="stat-card red">
+      <div class="label">🏆 Produto Top</div>
+      <div class="value" style="font-size:1rem;padding-top:6px;" id="top-produto">—</div>
+      <div class="sub">mais clicado</div>
+    </div>
+  </div>
+
+  <!-- TOP PRODUTOS -->
+  <div class="section-title">🏆 Produtos mais clicados</div>
+  <div class="top-produtos" id="top-produtos-lista">
+    <div class="loading">Carregando...</div>
+  </div>
+
+  <!-- ÚLTIMAS VISITAS -->
+  <div class="section-title">👁️ Últimas visitas</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data</th><th>Hora</th><th>Dispositivo</th><th>Status</th></tr></thead>
+      <tbody id="tabela-visitas"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- ÚLTIMOS CLIQUES -->
+  <div class="section-title">🛒 Últimos cliques em produtos</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data</th><th>Hora</th><th>Produto</th><th>Preço</th></tr></thead>
+      <tbody id="tabela-cliques"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="section-title">⚙️ Configuração</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;">
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px;">URL do Google Apps Script (salva automaticamente):</p>
+    <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/SEU_ID/exec"
+      style="width:100%;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:0.85rem;font-family:inherit;outline:none;margin-bottom:10px;"/>
+    <button onclick="salvarURL()" style="background:linear-gradient(135deg,var(--purple),#5B21B6);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:700;font-family:inherit;">Salvar URL</button>
+    <span id="url-salva" style="color:var(--green-light);font-size:0.8rem;margin-left:10px;display:none;">✅ Salvo!</span>
+  </div>
+</div>
+
+<script>
+  // ─── SENHA (troque aqui!) ───
+  const SENHA = "streammax2025";
+
+  // ─── LOGIN ───
+  function entrar() {
+    const senha = document.getElementById('senha-input').value;
+    if (senha === SENHA) {
+      localStorage.setItem('painel_auth', '1');
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('painel-screen').style.display = 'block';
+      const url = localStorage.getItem('script_url') || '';
+      document.getElementById('script-url-input').value = url;
+      carregarDados();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
+
+  function sair() {
+    localStorage.removeItem('painel_auth');
+    location.reload();
+  }
+
+  // Verificar se já está logado
+  if (localStorage.getItem('painel_auth') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('painel-screen').style.display = 'block';
+    const url = localStorage.getItem('script_url') || '';
+    document.getElementById('script-url-input').value = url;
+    carregarDados();
+  }
+
+  // ─── SALVAR URL ───
+  function salvarURL() {
+    const url = document.getElementById('script-url-input').value.trim();
+    localStorage.setItem('script_url', url);
+    document.getElementById('url-salva').style.display = 'inline';
+    setTimeout(() => document.getElementById('url-salva').style.display = 'none', 2000);
+    carregarDados();
+  }
+
+  // ─── CARREGAR DADOS ───
+  async function carregarDados() {
+    const url = localStorage.getItem('script_url');
+    if (!url) {
+      document.getElementById('ultima-atualizacao').textContent = '⚠️ Configure a URL do Apps Script abaixo';
+      return;
+    }
+
+    try {
+      const res = await fetch(url + '?tipo=stats');
+      const data = await res.json();
+
+      // Stats gerais
+      document.getElementById('total-visitas').textContent = data.totalVisitas;
+      document.getElementById('total-cliques').textContent = data.totalCliques;
+      document.getElementById('visitas-hoje').textContent = `hoje: ${data.visitasHoje}`;
+      document.getElementById('cliques-hoje').textContent = `hoje: ${data.cliquesHoje}`;
+
+      const taxa = data.totalVisitas > 0 ? ((data.totalCliques / data.totalVisitas) * 100).toFixed(1) + '%' : '0%';
+      document.getElementById('taxa').textContent = taxa;
+
+      // Top produto
+      const tops = Object.entries(data.topProdutos || {}).sort((a,b) => b[1]-a[1]);
+      document.getElementById('top-produto').textContent = tops.length > 0 ? tops[0][0] : '—';
+
+      // Top produtos barra
+      const maxVal = tops.length > 0 ? tops[0][1] : 1;
+      document.getElementById('top-produtos-lista').innerHTML = tops.length === 0
+        ? '<div class="empty">Nenhum clique ainda</div>'
+        : tops.map(([prod, count]) => `
+          <div class="produto-item">
+            <span style="font-size:0.85rem;font-weight:600;min-width:140px;">${prod}</span>
+            <div class="produto-bar-wrap"><div class="produto-bar" style="width:${(count/maxVal*100)}%"></div></div>
+            <span class="produto-count">${count}</span>
+          </div>`).join('');
+
+      // Tabela visitas
+      document.getElementById('tabela-visitas').innerHTML = (data.ultimasVisitas || []).length === 0
+        ? '<tr><td colspan="4" class="empty">Nenhuma visita ainda</td></tr>'
+        : data.ultimasVisitas.map(v => `
+          <tr>
+            <td>${v.data}</td><td>${v.hora}</td>
+            <td>${v.dispositivo}</td>
+            <td><span class="badge badge-green">Online</span></td>
+          </tr>`).join('');
+
+      // Tabela cliques
+      document.getElementById('tabela-cliques').innerHTML = (data.ultimosCliques || []).length === 0
+        ? '<tr><td colspan="4" class="empty">Nenhum clique ainda</td></tr>'
+        : data.ultimosCliques.map(c => `
+          <tr>
+            <td>${c.data}</td><td>${c.hora}</td>
+            <td><span class="badge badge-purple">${c.produto}</span></td>
+            <td style="color:var(--green-light);font-weight:700;">${c.preco}</td>
+          </tr>`).join('');
+
+      const agora = new Date().toLocaleTimeString('pt-BR');
+      document.getElementById('ultima-atualizacao').textContent = `Atualizado às ${agora}`;
+
+    } catch (err) {
+      document.getElementById('ultima-atualizacao').textContent = '❌ Erro ao buscar dados. Verifique a URL.';
+    }
+  }
+
+  // Auto-atualizar a cada 60 segundos
+  setInterval(carregarDados, 60000);
+</script>
+
+</body>
+</html>
