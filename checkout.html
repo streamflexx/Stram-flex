@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout — StreamMax</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #08080F; --bg2: #10101A; --bg3: #16162A;
+      --purple: #7C3AED; --purple-light: #9F67F5;
+      --green: #10B981; --green-light: #34D399;
+      --gold: #F59E0B; --white: #F8F8FF; --muted: #8887A4;
+      --border: rgba(124,58,237,0.25); --whatsapp: #25D366;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding: 24px 16px 60px; }
+    body::before { content:''; position:fixed; top:-20%; left:50%; transform:translateX(-50%); width:700px; height:400px; background:radial-gradient(ellipse, rgba(124,58,237,0.15) 0%, transparent 70%); pointer-events:none; }
+
+    .back { display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:0.85rem; text-decoration:none; margin-bottom:24px; }
+    .back:hover { color:var(--white); }
+
+    .container { max-width: 480px; margin: 0 auto; }
+
+    /* PRODUTO RESUMO */
+    .produto-card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:20px; display:flex; align-items:center; gap:16px; }
+    .produto-icon { width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; }
+    .produto-info h2 { font-size:1.1rem; font-weight:800; margin-bottom:4px; }
+    .produto-info p { font-size:0.8rem; color:var(--muted); }
+    .produto-preco { margin-left:auto; font-size:1.4rem; font-weight:900; color:var(--green-light); white-space:nowrap; }
+
+    /* MÉTODO */
+    .section-label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:12px; }
+    .metodos { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+    .metodo-btn { background:var(--bg2); border:2px solid var(--border); border-radius:14px; padding:16px 12px; text-align:center; cursor:pointer; transition:all 0.2s ease; }
+    .metodo-btn:hover { border-color:var(--purple); }
+    .metodo-btn.ativo { border-color:var(--purple); background:rgba(124,58,237,0.12); }
+    .metodo-btn .ico { font-size:1.8rem; margin-bottom:6px; }
+    .metodo-btn .label { font-size:0.85rem; font-weight:700; display:block; }
+    .metodo-btn .sub { font-size:0.7rem; color:var(--muted); margin-top:2px; }
+
+    /* PAINEIS */
+    .painel { display:none; }
+    .painel.ativo { display:block; }
+
+    /* FORMULARIO */
+    .form-group { margin-bottom:14px; }
+    .form-group label { font-size:0.78rem; font-weight:600; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+    .form-group input { width:100%; padding:13px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; color:var(--white); font-size:0.95rem; font-family:inherit; outline:none; transition:border-color 0.2s; }
+    .form-group input:focus { border-color:var(--purple); }
+    .form-group input::placeholder { color:var(--muted); }
+
+    /* QR CODE */
+    .qr-box { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:24px; text-align:center; margin-bottom:16px; }
+    .qr-box h3 { font-size:1rem; font-weight:800; margin-bottom:4px; }
+    .qr-box p { font-size:0.82rem; color:var(--muted); margin-bottom:20px; }
+    #qrcode { display:inline-block; background:#fff; padding:12px; border-radius:12px; margin-bottom:16px; }
+    .pix-key-box { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .pix-key-box span { font-family:monospace; font-size:0.9rem; color:var(--green-light); }
+    .copy-btn { background:rgba(16,185,129,0.15); color:var(--green-light); border:1px solid rgba(16,185,129,0.3); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.78rem; font-weight:700; font-family:inherit; white-space:nowrap; transition:opacity 0.2s; }
+    .copy-btn:hover { opacity:0.8; }
+    .pix-valor { font-size:0.8rem; color:var(--muted); text-align:center; }
+
+    /* BOTÕES */
+    .btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; font-family:inherit; transition:opacity 0.2s, transform 0.2s; text-decoration:none; margin-bottom:10px; }
+    .btn:hover { opacity:0.88; transform:scale(1.01); }
+    .btn-pix { background:linear-gradient(135deg, var(--green), #059669); color:#fff; }
+    .btn-whatsapp { background:var(--whatsapp); color:#fff; }
+    .btn-purple { background:linear-gradient(135deg, var(--purple), #5B21B6); color:#fff; }
+    .btn svg { width:20px; height:20px; flex-shrink:0; }
+
+    /* SUCESSO */
+    #painel-sucesso { text-align:center; padding:20px 0; }
+    #painel-sucesso .ico { font-size:4rem; margin-bottom:16px; }
+    #painel-sucesso h2 { font-size:1.4rem; font-weight:900; margin-bottom:8px; }
+    #painel-sucesso p { color:var(--muted); font-size:0.9rem; line-height:1.6; margin-bottom:24px; }
+
+    .wa-float { position:fixed; bottom:24px; right:20px; z-index:999; background:var(--whatsapp); color:#fff; width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(37,211,102,0.4); text-decoration:none; animation:pulse-wa 2.5s ease-in-out infinite; }
+    .wa-float svg { width:26px; height:26px; }
+    @keyframes pulse-wa { 0%,100%{box-shadow:0 4px 20px rgba(37,211,102,0.4)} 50%{box-shadow:0 4px 36px rgba(37,211,102,0.65)} }
+
+    .step-indicator { display:flex; gap:8px; align-items:center; margin-bottom:24px; }
+    .step-dot { width:8px; height:8px; border-radius:50%; background:var(--border); }
+    .step-dot.ativo { background:var(--purple-light); width:24px; border-radius:4px; }
+    .step-label { font-size:0.78rem; color:var(--muted); margin-left:4px; }
+
+    .alerta-pix { background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:12px 14px; font-size:0.82rem; color:var(--gold); margin-bottom:16px; line-height:1.6; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <a href="index.html" class="back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Voltar ao catálogo
+  </a>
+
+  <!-- RESUMO DO PRODUTO -->
+  <div class="produto-card" id="produto-card">
+    <div class="produto-icon" id="produto-icon">🎬</div>
+    <div class="produto-info">
+      <h2 id="produto-nome">Carregando...</h2>
+      <p id="produto-desc">30 dias de acesso</p>
+    </div>
+    <div class="produto-preco" id="produto-preco">R$5,00</div>
+  </div>
+
+  <!-- ESCOLHA O MÉTODO -->
+  <div class="section-label">Como quer pagar?</div>
+  <div class="metodos">
+    <div class="metodo-btn" id="btn-pix" onclick="escolherMetodo('pix')">
+      <div class="ico">💠</div>
+      <span class="label">Via Pix</span>
+      <div class="sub">Instantâneo</div>
+    </div>
+    <div class="metodo-btn" id="btn-zap" onclick="escolherMetodo('whatsapp')">
+      <div class="ico">💬</div>
+      <span class="label">Via WhatsApp</span>
+      <div class="sub">Combinamos direto</div>
+    </div>
+  </div>
+
+  <!-- PAINEL PIX -->
+  <div class="painel" id="painel-pix">
+    <div class="step-indicator">
+      <div class="step-dot ativo"></div>
+      <div class="step-dot" id="step2"></div>
+      <span class="step-label" id="step-label">Passo 1: Seus dados</span>
+    </div>
+
+    <!-- ETAPA 1: FORMULARIO -->
+    <div id="etapa-form">
+      <div class="section-label">Seus dados para entrega</div>
+
+      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:1.3rem;">🔒</span>
+        <div>
+          <div style="font-size:0.85rem;font-weight:700;color:#34D399;margin-bottom:4px;">100% Seguro</div>
+          <div style="font-size:0.78rem;color:#8887A4;line-height:1.6;">Seus dados são usados apenas para entrega do produto. Não compartilhamos com ninguém.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Seu nome <span style="color:#8887A4;font-size:0.7rem;font-weight:400;">(opcional)</span></label>
+        <input type="text" id="input-nome" placeholder="Como quer ser chamado?" />
+      </div>
+      <div class="form-group">
+        <label>Email <span style="color:#EF4444;font-size:0.72rem;">* obrigatório</span></label>
+        <input type="email" id="input-email" placeholder="seuemail@gmail.com" />
+        <div style="font-size:0.72rem;color:#8887A4;margin-top:4px;">📧 O acesso ao produto será enviado para este email</div>
+      </div>
+      <div class="form-group">
+        <label>WhatsApp com DDD <span style="color:#EF4444;font-size:0.72rem;">* obrigatório</span></label>
+        <input type="tel" id="input-tel" placeholder="(11) 99999-9999" />
+        <div style="font-size:0.72rem;color:#8887A4;margin-top:4px;">📱 Para confirmarmos a entrega do seu acesso</div>
+      </div>
+      <button class="btn btn-pix" onclick="irParaPix()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.9 2C6.4 2 2 6.4 2 11.9s4.4 9.9 9.9 9.9 9.9-4.4 9.9-9.9S17.4 2 11.9 2zm4.6 11.7l-2.8 2.8c-.4.4-1 .4-1.4 0l-2.8-2.8c-.4-.4-.4-1 0-1.4l2.8-2.8c.4-.4 1-.4 1.4 0l2.8 2.8c.4.4.4 1 0 1.4z"/></svg>
+        Continuar para o Pix
+      </button>
+    </div>
+
+    <!-- ETAPA 2: QR CODE -->
+    <div id="etapa-qr" style="display:none;">
+      <div class="qr-box">
+        <h3>📱 Escaneie o QR Code</h3>
+        <p>Abra seu banco e pague exatamente o valor abaixo</p>
+        <div id="qrcode"></div>
+        <div class="pix-key-box">
+          <span id="pix-key-text">12983132609</span>
+          <button class="copy-btn" onclick="copiarChave()">Copiar chave</button>
+        </div>
+        <div class="pix-valor" id="pix-valor-text"></div>
+      </div>
+      <div class="alerta-pix">⚠️ Após pagar, clique no botão abaixo. Confirmaremos o pagamento e enviaremos seu acesso em até 5 minutos.</div>
+      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 14px;font-size:0.78rem;color:#34D399;margin-bottom:12px;line-height:1.6;">
+        🔒 Pagamento 100% seguro via Pix oficial. O dinheiro vai direto para a conta do vendedor.
+      </div>
+      <button class="btn btn-whatsapp" onclick="jaoPaguei()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        ✅ Já paguei! Quero meu acesso
+      </button>
+    </div>
+  </div>
+
+  <!-- PAINEL WHATSAPP -->
+  <div class="painel" id="painel-whatsapp">
+    <div class="section-label">Seus dados (opcional)</div>
+    <div class="form-group">
+      <label>Seu nome</label>
+      <input type="text" id="wa-nome" placeholder="Como quer ser chamado?" />
+    </div>
+    <div class="form-group">
+      <label>Email (opcional)</label>
+      <input type="email" id="wa-email" placeholder="seuemail@gmail.com" />
+    </div>
+    <button class="btn btn-whatsapp" onclick="irWhatsapp()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      Falar no WhatsApp agora
+    </button>
+    <p style="text-align:center;font-size:0.78rem;color:var(--muted);">Te redirecionamos para conversar diretamente comigo</p>
+  </div>
+
+</div>
+
+<!-- WA FLOAT -->
+<a class="wa-float" href="https://wa.me/5534996980605" target="_blank">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<script>
+  // EmailJS config
+  emailjs.init('-9haRzqQUxjBSOi3q');
+  const EMAILJS_SERVICE = 'service_wwphouw';
+  const EMAILJS_TEMPLATE = 'template_zelakwa';
+
+  const WA_NUM = "5534996980605";
+  const CHAVE_PIX = "12983132609";
+  let dadosCliente = {};
+
+  // Ler params da URL
+  const params = new URLSearchParams(location.search);
+  const produto = { nome: params.get('nome') || 'Produto', preco: params.get('preco') || 'R$5,00', desc: params.get('desc') || '30 dias de acesso', cor: params.get('cor') || '#7C3AED' };
+
+  // Preencher resumo
+  document.getElementById('produto-nome').textContent = produto.nome;
+  document.getElementById('produto-desc').textContent = produto.desc;
+  document.getElementById('produto-preco').textContent = produto.preco;
+  document.getElementById('produto-icon').style.background = produto.cor + '33';
+  document.title = 'Checkout — ' + produto.nome;
+
+  // Emojis por produto
+  const emojis = { 'HBO Max':'🎬', 'Amazon Prime':'📦', 'Disney+ Padrão':'🏰', 'Disney+ Pro':'⭐', 'Netflix Padrão':'🎞️', 'Netflix Pro':'🔴', 'Paramount+':'⛰️', 'Telecine':'🎥', 'YouTube Premium':'▶️', 'ChatGPT Pro':'🤖' };
+  document.getElementById('produto-icon').textContent = emojis[produto.nome] || '🎬';
+
+  function escolherMetodo(metodo) {
+    document.getElementById('btn-pix').classList.toggle('ativo', metodo === 'pix');
+    document.getElementById('btn-zap').classList.toggle('ativo', metodo === 'whatsapp');
+    document.getElementById('painel-pix').classList.toggle('ativo', metodo === 'pix');
+    document.getElementById('painel-whatsapp').classList.toggle('ativo', metodo === 'whatsapp');
+  }
+
+  function validarEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function validarTel(tel) {
+    return tel.replace(/\D/g,'').length >= 10;
+  }
+
+  function irParaPix() {
+    const nome = document.getElementById('input-nome').value.trim();
+    const email = document.getElementById('input-email').value.trim();
+    const tel = document.getElementById('input-tel').value.trim();
+
+    if (!email || !tel) {
+      alert('⚠️ Por favor, preencha o Email e o WhatsApp para continuar!');
+      return;
+    }
+    if (!validarEmail(email)) {
+      alert('❌ Email inválido! Verifique e tente novamente.\nEx: seunome@gmail.com');
+      return;
+    }
+    if (!validarTel(tel)) {
+      alert('❌ WhatsApp inválido! Digite com DDD, pelo menos 10 números.\nEx: (34) 99999-9999');
+      return;
+    }
+    dadosCliente = { nome: nome || 'Não informado', email, tel };
+
+    // Mostrar QR
+    document.getElementById('etapa-form').style.display = 'none';
+    document.getElementById('etapa-qr').style.display = 'block';
+    document.getElementById('step2').classList.add('ativo');
+    document.getElementById('step-label').textContent = 'Passo 2: Realize o pagamento';
+    document.getElementById('pix-valor-text').textContent = 'Valor: ' + produto.preco + ' — Chave: ' + CHAVE_PIX;
+
+    // Gerar QR Code
+    document.getElementById('qrcode').innerHTML = '';
+    new QRCode(document.getElementById('qrcode'), {
+      text: CHAVE_PIX,
+      width: 180, height: 180,
+      colorDark: '#000000', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  function copiarChave() {
+    navigator.clipboard.writeText(CHAVE_PIX).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ Copiado!';
+      setTimeout(() => btn.textContent = 'Copiar chave', 2000);
+    });
+  }
+
+  function jaoPaguei() {
+    const btn = document.querySelector('.btn.btn-whatsapp');
+    btn.textContent = '⏳ Enviando notificação...';
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
+
+    // Enviar email para o dono
+    emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      produto: produto.nome,
+      preco: produto.preco,
+      nome_cliente: dadosCliente.nome,
+      email_cliente: dadosCliente.email,
+      tel_cliente: dadosCliente.tel,
+    }).then(() => {
+      console.log('Email enviado!');
+    }).catch((err) => {
+      console.log('Erro email:', err);
+    });
+
+    // Abrir WhatsApp com os dados
+    const msg = encodeURIComponent(
+      '✅ *JÁ PAGUEI VIA PIX!*\n\n' +
+      '📦 *Produto:* ' + produto.nome + '\n' +
+      '💰 *Valor:* ' + produto.preco + '\n\n' +
+      '👤 *Nome:* ' + dadosCliente.nome + '\n' +
+      '📧 *Email:* ' + dadosCliente.email + '\n' +
+      '📱 *WhatsApp:* ' + dadosCliente.tel + '\n\n' +
+      'Aguardo a confirmação e o envio do acesso! 🙏'
+    );
+
+    setTimeout(() => {
+      window.open('https://wa.me/' + WA_NUM + '?text=' + msg, '_blank');
+      btn.innerHTML = '✅ Notificação enviada!';
+      btn.style.background = '#10B981';
+    }, 1500);
+  }
+
+  function irWhatsapp() {
+    const nome = document.getElementById('wa-nome').value.trim();
+    const email = document.getElementById('wa-email').value.trim();
+    let msg = '👋 Olá! Tenho interesse em *' + produto.nome + '* por ' + produto.preco + '.';
+    if (nome) msg += '\n\n👤 Nome: ' + nome;
+    if (email) msg += '\n📧 Email: ' + email;
+    msg += '\n\nPoderia me ajudar?';
+    window.open('https://wa.me/' + WA_NUM + '?text=' + encodeURIComponent(msg), '_blank');
+  }
+</script>
+</body>
+</html>
