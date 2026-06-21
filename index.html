@@ -415,6 +415,54 @@
       50% { box-shadow: 0 4px 40px rgba(37,211,102,0.7); }
     }
 
+    /* ── FAQ ACCORDION ── */
+    .faq-item {
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+    .faq-item.open { border-color: rgba(124,58,237,0.4); }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--white);
+      user-select: none;
+    }
+    .faq-question svg {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      color: var(--muted);
+      transition: transform 0.3s ease, color 0.2s ease;
+    }
+    .faq-item.open .faq-question svg {
+      transform: rotate(180deg);
+      color: var(--purple-light);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+      padding: 0 20px;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 240px;
+      padding: 0 20px 20px;
+    }
+    .faq-answer p {
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
     /* ── FOOTER ── */
     footer {
       position: relative;
@@ -436,10 +484,86 @@
       .price-new { font-size: 1.3rem; }
       .wa-float span { display: none; }
       .wa-float { padding: 13px; }
+      .steps-grid { grid-template-columns: 1fr 1fr !important; }
+      .testimonials-grid { grid-template-columns: 1fr !important; }
+    }
+
+    /* ── PROMO BANNER ── */
+    .promo-banner {
+      position: sticky; top: 0; z-index: 300;
+      background: linear-gradient(90deg, #DC2626, #EF4444, #DC2626);
+      background-size: 200% 100%;
+      animation: promoBg 3s ease infinite;
+      color: #fff; text-align: center;
+      padding: 10px 16px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      flex-wrap: wrap; font-size: 0.85rem; font-weight: 800;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    @keyframes promoBg { 0%,100%{background-position:0%} 50%{background-position:100%} }
+    .promo-text { display: flex; align-items: center; gap: 8px; }
+    .promo-countdown {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,0,0,0.3); border-radius: 8px; padding: 4px 12px;
+    }
+    .countdown-block { text-align: center; }
+    .countdown-num { font-size: 1rem; font-weight: 900; font-family: monospace; }
+    .countdown-label { font-size: 0.6rem; opacity: 0.8; font-weight: 600; }
+    .countdown-sep { font-size: 1rem; font-weight: 900; opacity: 0.7; margin-bottom: 2px; }
+
+    /* ── SOCIAL PROOF NOTIFICATION ── */
+    .notif-pop {
+      position: fixed; bottom: 80px; left: 16px; z-index: 400;
+      background: #1a1a2e; border: 1px solid rgba(124,58,237,0.4);
+      border-left: 3px solid #25D366;
+      border-radius: 12px; padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      max-width: 280px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateX(-120%); opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+    }
+    .notif-pop.show { transform: translateX(0); opacity: 1; }
+    .notif-avatar {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #7C3AED, #5B21B6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 800; color: #fff; font-family: inherit;
+    }
+    .notif-info {}
+    .notif-name { font-size: 0.78rem; font-weight: 700; color: #34D399; }
+    .notif-action { font-size: 0.72rem; color: #8887A4; line-height: 1.4; margin-top:1px }
+    .notif-time { font-size: 0.65rem; color: #6E6A8A; margin-top: 3px; }
+
+    @media(max-width:480px){
+      .promo-banner{font-size:0.75rem;gap:8px}
+      .countdown-num{font-size:0.9rem}
+      .notif-pop{max-width:240px}
     }
   </style>
 </head>
 <body>
+
+<!-- PROMO BANNER -->
+<div class="promo-banner">
+  <div class="promo-text">🔥 PROMOÇÃO RELÂMPAGO — ÚLTIMAS UNIDADES</div>
+  <div class="promo-countdown">
+    <div class="countdown-block"><div class="countdown-num" id="cd-h">12</div><div class="countdown-label">HRS</div></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-block"><div class="countdown-num" id="cd-m">00</div><div class="countdown-label">MIN</div></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-block"><div class="countdown-num" id="cd-s">00</div><div class="countdown-label">SEG</div></div>
+  </div>
+</div>
+
+<!-- SOCIAL PROOF NOTIFICATION -->
+<div class="notif-pop" id="notif-pop">
+  <div class="notif-avatar" id="notif-avatar">M</div>
+  <div class="notif-info">
+    <div class="notif-name" id="notif-name">Marcos S.</div>
+    <div class="notif-action" id="notif-action">Comprou <strong>Netflix Pro</strong> agora mesmo ✅</div>
+    <div class="notif-time" id="notif-time">há poucos segundos</div>
+  </div>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -535,7 +659,7 @@
         <div class="card-desc">Marvel, Star Wars, Pixar, Disney clássicos e muito mais.</div>
         <div class="price-row">
           <span class="price-old">R$33,90</span>
-          <span class="price-new">R$8,00</span>
+          <span class="price-new">R$5,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -561,7 +685,7 @@
         <div class="card-desc">Disney+, Star+ e ESPN numa só conta, com mais conteúdo.</div>
         <div class="price-row">
           <span class="price-old">R$44,90</span>
-          <span class="price-new">R$10,00</span>
+          <span class="price-new">R$7,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -586,7 +710,7 @@
         <div class="card-desc">Séries, filmes e documentários originais Netflix.</div>
         <div class="price-row">
           <span class="price-old">R$44,90</span>
-          <span class="price-new">R$8,00</span>
+          <span class="price-new">R$7,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -612,7 +736,7 @@
         <div class="card-desc">Acesso completo Netflix com qualidade superior e mais telas.</div>
         <div class="price-row">
           <span class="price-old">R$59,90</span>
-          <span class="price-new">R$10,00</span>
+          <span class="price-new">R$8,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -637,7 +761,7 @@
         <div class="card-desc">Yellowstone, Tulsa King, filmes e séries exclusivos.</div>
         <div class="price-row">
           <span class="price-old">R$19,90</span>
-          <span class="price-new">R$8,00</span>
+          <span class="price-new">R$5,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -662,7 +786,7 @@
         <div class="card-desc">Os melhores filmes em alta definição, lançamentos e clássicos.</div>
         <div class="price-row">
           <span class="price-old">R$37,90</span>
-          <span class="price-new">R$7,00</span>
+          <span class="price-new">R$5,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -687,7 +811,7 @@
         <div class="card-desc">Sem anúncios, download de vídeos e YouTube Music incluído.</div>
         <div class="price-row">
           <span class="price-old">R$23,90</span>
-          <span class="price-new">R$7,00</span>
+          <span class="price-new">R$5,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -712,7 +836,7 @@
         <div class="card-desc">Acesso à IA mais avançada do mundo para trabalho, estudos e criatividade.</div>
         <div class="price-row">
           <span class="price-old">R$107,00</span>
-          <span class="price-new">R$30,00</span>
+          <span class="price-new">R$15,00</span>
           <span class="price-period">/mês</span>
         </div>
         <div class="btn-duo">
@@ -731,17 +855,178 @@
   </div>
 </section>
 
-<!-- GUARANTEE -->
-<div class="guarantee" style="margin: 0 16px 64px; max-width:928px; margin-left:auto; margin-right:auto; position:relative;z-index:1;">
-  <h3>✅ Como funciona?</h3>
-  <p>É simples, rápido e seguro. Escolha o serviço, clique no botão e fale comigo pelo WhatsApp.</p>
-  <div class="guarantee-icons">
-    <div class="g-icon"><div class="ico">1️⃣</div><p>Escolha o plano</p></div>
-    <div class="g-icon"><div class="ico">💬</div><p>Fale no WhatsApp</p></div>
-    <div class="g-icon"><div class="ico">💸</div><p>Pague via Pix</p></div>
-    <div class="g-icon"><div class="ico">⚡</div><p>Acesso imediato</p></div>
+<!-- COMO FUNCIONA + SEGURANÇA -->
+<section style="max-width:960px; margin:0 auto; padding:0 16px 64px; position:relative; z-index:1;">
+  <div style="background: linear-gradient(160deg, var(--bg2) 0%, #0D0D14 100%); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:40px 28px;">
+
+    <div style="display:inline-flex; align-items:center; gap:8px; font-size:0.78rem; font-weight:700; color:#34D399; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); padding:7px 16px; border-radius:99px; margin-bottom:18px;">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg>
+      Pix 100% seguro
+    </div>
+
+    <h2 style="font-size:1.5rem; font-weight:800; letter-spacing:-0.4px; margin-bottom:12px; max-width:560px;">
+      Pagamento garantido, do Pix ao acesso na sua mão
+    </h2>
+    <p style="color:var(--muted); font-size:0.92rem; line-height:1.65; max-width:560px; margin-bottom:36px;">
+      Todo o processo é transparente: você escolhe o produto, paga via Pix ou combina direto no WhatsApp, e recebemos a confirmação antes de qualquer envio.
+    </p>
+
+    <div class="steps-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:32px;">
+      <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px 16px;">
+        <div style="font-size:1.4rem; margin-bottom:10px;">1️⃣</div>
+        <h4 style="font-size:0.88rem; font-weight:700; margin-bottom:5px;">Escolha o plano</h4>
+        <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">Selecione o streaming ideal pra você.</p>
+      </div>
+      <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px 16px;">
+        <div style="font-size:1.4rem; margin-bottom:10px;">💬</div>
+        <h4 style="font-size:0.88rem; font-weight:700; margin-bottom:5px;">Fale no WhatsApp</h4>
+        <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">Direto com a gente, sem robôs.</p>
+      </div>
+      <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px 16px;">
+        <div style="font-size:1.4rem; margin-bottom:10px;">💸</div>
+        <h4 style="font-size:0.88rem; font-weight:700; margin-bottom:5px;">Pague via Pix</h4>
+        <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">QR Code instantâneo, sem comprovante.</p>
+      </div>
+      <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px 16px;">
+        <div style="font-size:1.4rem; margin-bottom:10px;">⚡</div>
+        <h4 style="font-size:0.88rem; font-weight:700; margin-bottom:5px;">Acesso imediato</h4>
+        <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">Login e senha em poucos minutos.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:center; gap:32px; flex-wrap:wrap; padding-top:24px; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--white); font-weight:600;">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#34D399" stroke-width="2.4"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Dados protegidos
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--white); font-weight:600;">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#34D399" stroke-width="2.4"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Pix 100% oficial
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--white); font-weight:600;">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#34D399" stroke-width="2.4"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Suporte humano real
+      </div>
+    </div>
   </div>
-</div>
+</section>
+
+<!-- AVALIAÇÕES -->
+<section style="max-width:960px; margin:0 auto; padding:0 16px 64px; position:relative; z-index:1;">
+  <div class="section-title" style="margin-bottom:28px;">
+    <h2>O que dizem nossos clientes</h2>
+    <p>Depoimentos reais, identidade preservada</p>
+  </div>
+  <div class="testimonials-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+
+    <div style="background: var(--bg2); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.16);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:var(--purple-light);">M.S.</div>
+        <div style="display:flex; flex-direction:column;">
+          <span style="font-size:0.82rem; font-weight:700; color:var(--white);">Cliente verificado</span>
+          <span style="font-size:0.7rem; color:var(--muted);">HBO Max + Disney+</span>
+        </div>
+      </div>
+      <div style="color:#F59E0B; font-size:0.78rem; letter-spacing:1px;">★★★★★</div>
+      <p style="font-size:0.84rem; color:var(--muted); line-height:1.6;">"Amei o atendimento. Deu certo, muito obrigado!"</p>
+      <span style="display:inline-flex; align-items:center; gap:5px; font-size:0.68rem; color:#34D399; font-weight:700;">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Compra confirmada
+      </span>
+    </div>
+
+    <div style="background: var(--bg2); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.16);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:var(--purple-light);">R.A.</div>
+        <div style="display:flex; flex-direction:column;">
+          <span style="font-size:0.82rem; font-weight:700; color:var(--white);">Cliente verificado</span>
+          <span style="font-size:0.7rem; color:var(--muted);">YouTube Premium</span>
+        </div>
+      </div>
+      <div style="color:#F59E0B; font-size:0.78rem; letter-spacing:1px;">★★★★★</div>
+      <p style="font-size:0.84rem; color:var(--muted); line-height:1.6;">"Deu certo, foi muito rápido, amei. Só vou assinar com você agora."</p>
+      <span style="display:inline-flex; align-items:center; gap:5px; font-size:0.68rem; color:#34D399; font-weight:700;">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Compra confirmada
+      </span>
+    </div>
+
+    <div style="background: var(--bg2); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.16);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:var(--purple-light);">J.P.</div>
+        <div style="display:flex; flex-direction:column;">
+          <span style="font-size:0.82rem; font-weight:700; color:var(--white);">Cliente verificado</span>
+          <span style="font-size:0.7rem; color:var(--muted);">3 produtos combinados</span>
+        </div>
+      </div>
+      <div style="color:#F59E0B; font-size:0.78rem; letter-spacing:1px;">★★★★★</div>
+      <p style="font-size:0.84rem; color:var(--muted); line-height:1.6;">"Deu certo os 3, muito obrigado. Amei o serviço!"</p>
+      <span style="display:inline-flex; align-items:center; gap:5px; font-size:0.68rem; color:#34D399; font-weight:700;">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Compra confirmada
+      </span>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="max-width:760px; margin:0 auto; padding:0 16px 64px; position:relative; z-index:1;">
+  <div class="section-title" style="margin-bottom:28px;">
+    <h2>Perguntas frequentes</h2>
+    <p>Tudo o que você precisa saber antes de comprar</p>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question" onclick="toggleFaq(this)">
+      Como recebo meu produto?
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="faq-answer">
+      <p>Após a confirmação do pagamento via Pix ou combinação no WhatsApp, enviamos o login e a senha de acesso diretamente na sua conversa do WhatsApp. É rápido e simples.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question" onclick="toggleFaq(this)">
+      Em quanto tempo receberei?
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="faq-answer">
+      <p>Normalmente o acesso é liberado em até 5 minutos após a confirmação do pagamento. Em horários de pico, pode levar um pouco mais, mas sempre te avisamos pelo WhatsApp.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question" onclick="toggleFaq(this)">
+      Posso pedir reembolso?
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="faq-answer">
+      <p>Se houver qualquer problema na ativação do seu acesso, resolvemos rapidamente ou devolvemos o valor pago. Sua satisfação é garantida.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question" onclick="toggleFaq(this)">
+      Funciona na minha região?
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="faq-answer">
+      <p>Sim! Nossos acessos funcionam em qualquer lugar do Brasil, basta ter uma conexão com a internet. Você pode usar no celular, smart TV, computador ou tablet.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question" onclick="toggleFaq(this)">
+      O pagamento é mesmo seguro?
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="faq-answer">
+      <p>Sim, 100% seguro. O Pix vai direto para nossa conta oficial e nunca pedimos dados bancários ou senhas de cartão. Todo atendimento é feito por uma pessoa real no WhatsApp.</p>
+    </div>
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer>
@@ -758,6 +1043,14 @@
 
 
   <script>
+  // ─── FAQ ACCORDION ───
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+
   // ─── ANALYTICS STREAMMAX ───
   const SCRIPT_URL = localStorage.getItem('script_url') || '';
 
@@ -791,5 +1084,79 @@
   });
   </script>
 
+<script>
+// ── COUNTDOWN 12H ──
+(function() {
+  const KEY = 'promo_end';
+  let end = localStorage.getItem(KEY);
+  if (!end || Date.now() > parseInt(end)) {
+    end = Date.now() + 12 * 60 * 60 * 1000;
+    localStorage.setItem(KEY, end);
+  }
+  function update() {
+    let diff = Math.max(0, parseInt(end) - Date.now());
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+    if (diff <= 0) {
+      localStorage.removeItem(KEY);
+    }
+  }
+  update();
+  setInterval(update, 1000);
+})();
+
+// ── SOCIAL PROOF NOTIFICATIONS ──
+(function() {
+  const nomes = [
+    'Ana L.','Marcos S.','Juliana C.','Rafael T.','Fernanda O.',
+    'Bruno M.','Camila R.','Diego A.','Larissa P.','Thiago F.',
+    'Beatriz N.','Gabriel V.','Isabela K.','Lucas M.','Amanda S.',
+    'João P.','Priscila C.','Rodrigo B.','Natalia R.','Felipe S.',
+    'Carla M.','Eduardo L.','Vanessa T.','Henrique A.','Leticia F.'
+  ];
+  const servicos = [
+    'Netflix Pro','Netflix Padrão','HBO Max','Disney+ Padrão',
+    'Disney+ Pro','Amazon Prime','YouTube Premium','Paramount+',
+    'Telecine','ChatGPT Pro'
+  ];
+  const tempos = [
+    'há poucos segundos','há 1 minuto','há 2 minutos','há 3 minutos',
+    'agora mesmo','há instantes'
+  ];
+  const cores = ['#7C3AED','#EF4444','#10B981','#F59E0B','#3B82F6','#EC4899'];
+
+  const pop = document.getElementById('notif-pop');
+  const avatarEl = document.getElementById('notif-avatar');
+  const nameEl = document.getElementById('notif-name');
+  const actionEl = document.getElementById('notif-action');
+  const timeEl = document.getElementById('notif-time');
+
+  function showNotif() {
+    const nome = nomes[Math.floor(Math.random() * nomes.length)];
+    const servico = servicos[Math.floor(Math.random() * servicos.length)];
+    const tempo = tempos[Math.floor(Math.random() * tempos.length)];
+    const cor = cores[Math.floor(Math.random() * cores.length)];
+
+    avatarEl.textContent = nome[0];
+    avatarEl.style.background = `linear-gradient(135deg, ${cor}, ${cor}99)`;
+    nameEl.textContent = nome;
+    actionEl.innerHTML = `Comprou <strong>${servico}</strong> ✅`;
+    timeEl.textContent = tempo;
+
+    pop.classList.add('show');
+    setTimeout(() => pop.classList.remove('show'), 4000);
+  }
+
+  // Primeira aparição após 3s, depois a cada intervalo aleatório
+  setTimeout(() => {
+    showNotif();
+    setInterval(showNotif, Math.random() * 8000 + 10000); // entre 10 e 18s
+  }, 3000);
+})();
+</script>
 </body>
 </html>
