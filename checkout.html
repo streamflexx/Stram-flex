@@ -50,6 +50,11 @@ ol{margin:18px 0;padding:0 0 0 20px;font-size:14.5px}ol li{padding:3px 0}
 h2{font:400 26px "Bebas Neue",Impact,sans-serif;letter-spacing:1.5px;margin:0 0 6px;text-align:center}
 .foot{text-align:center;color:var(--mut);font-size:12px;margin-top:18px}
 .hide{display:none}
+.proof-note{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--pri2);background:linear-gradient(135deg,rgba(122,61,240,.16),rgba(229,35,127,.10));border-radius:16px;padding:14px;margin:0 0 16px;box-shadow:0 0 18px rgba(122,61,240,.22)}
+.proof-note .ic{flex:none;width:44px;height:44px;border-radius:12px;background:rgba(122,61,240,.28);display:grid;place-items:center;font-size:24px}
+.proof-note b{display:block;font-size:15.5px;margin-bottom:3px}
+.proof-note p{margin:0;font-size:13.5px;color:var(--mut);line-height:1.45}
+.proof-note p strong{color:var(--ink);font-weight:600}
 </style>
 </head>
 <body>
@@ -95,12 +100,20 @@ h2{font:400 26px "Bebas Neue",Impact,sans-serif;letter-spacing:1.5px;margin:0 0 
     <h2>Depois de pagar</h2>
     <ol>
       <li>Salve o comprovante no app do seu banco.</li>
-      <li>Envie o comprovante por um dos botões abaixo. Seus dados vão junto.</li>
+      <li>Toque em um dos botões abaixo: a mensagem automática com seus dados é preparada pra você.</li>
+      <li>Envie a mensagem <b>junto com a foto (ou print) do comprovante</b>.</li>
       <li>Conferimos o pagamento e enviamos seu acesso.</li>
     </ol>
+    <div class="proof-note" role="note">
+      <div class="ic" aria-hidden="true">📸</div>
+      <div>
+        <b>Envie a foto do comprovante!</b>
+        <p>Ao tocar no botão, a mensagem automática é <strong>copiada ou preenchida</strong> pra você. Cole e envie <strong>junto com a foto ou print do comprovante</strong> do banco. Sem o comprovante, não conseguimos liberar seu acesso.</p>
+      </div>
+    </div>
     <a class="btn ok" id="wa" target="_blank" rel="noopener">Enviar comprovante no WhatsApp</a>
     <button class="btn line" id="ig">Enviar pelo Instagram</button>
-    <p class="hint">No Instagram, a mensagem é copiada: é só colar na conversa e anexar o comprovante.</p>
+    <p class="hint">No WhatsApp a mensagem já vai pronta; no Instagram ela é copiada: é só colar na conversa. Nos dois, anexe a foto do comprovante.</p>
   </section>
 
   <p class="foot">🔒 Seus dados são usados somente para entregar seu acesso.</p>
@@ -114,7 +127,7 @@ const CFG = {
   pixName:  "JOAO VICTOR",       // nome da conta (até 25 letras, sem acento)
   pixCity:  "BRASIL",           // o Pix exige este campo; "BRASIL" evita mostrar sua cidade
   whats:    "5534996980605",    // seu WhatsApp com DDI+DDD (mesmo da página de vendas)
-  instagram:"seriex_",         // seu @ do Instagram, sem o @
+  instagram:"seriex.__",         // seu @ do Instagram, sem o @
   planoPadrao: "Pacote Básico", // usado se a página abrir sem ?plano=
   valorPadrao: 10.90
 };
@@ -177,7 +190,7 @@ function pixPayload(){
 
 // ----- Navegação entre etapas -----
 function msgComprovante(){
-  return "Olá! Segue meu comprovante de pagamento.\n\nProduto: " + PLANO + "\nValor: " + brl(VALOR) +
+  return "Olá! Segue meu comprovante de pagamento (foto em anexo).\n\nProduto: " + PLANO + "\nValor: " + brl(VALOR) +
     "\nE-mail: " + em.value.trim() + "\nWhatsApp: " + tel.value;
 }
 go.onclick = () => {
@@ -208,7 +221,7 @@ function copiar(txt){
 function flash(btn, txt){ const old = btn.textContent; btn.textContent = txt; setTimeout(() => btn.textContent = old, 2200); }
 $("copy").onclick = function(){ copiar($("code").value).then(() => flash(this, "✓ Código copiado!")).catch(() => { $("code").select(); flash(this, "Toque no código e copie"); }); };
 $("ig").onclick = function(){
-  copiar(msgComprovante()).catch(() => {}).then(() => { flash(this, "✓ Mensagem copiada! Abrindo…"); window.open("https://ig.me/m/" + CFG.instagram, "_blank", "noopener"); });
+  copiar(msgComprovante()).catch(() => {}).then(() => { flash(this, "✓ Copiada! Cole e envie com a foto"); window.open("https://www.instagram.com/" + CFG.instagram + "/", "_blank", "noopener"); });
 };
 
 // ----- Fundo: partículas roxas (mesmo da página de vendas) -----
